@@ -30,28 +30,31 @@ import Game.Map;
 public class GameFrame extends JPanel implements MouseListener, ActionListener, ComponentListener{
 
 	private static final long serialVersionUID = 1L;
-	private Map map; 
-	private BufferedImage myImage;
+
 	public int Image_initial_Width; 
 	public int Image_initial_Height;
+	/*pictures buffered images:*/
+	private BufferedImage mapImage; //	private BufferedImage myImage;
+	private BufferedImage packmanImage;
+	private BufferedImage fruitImage;
+	//TODO: Encapsulate it into classes (getPathImagePackman())
+	private final String packmanPath = "Images\\Packman.png";
+	private final String fruitPath = "Images\\Fruit.png";
+	/*repaint's coordinates:*/
+	private int x = -1;
+	private int y = -1;
+	private double ratioY;
+	private double ratioX;
 
-	private final  String imagePackman = "C:\\Users\\owner\\Desktop\\forExe3\\Packman.png";
-	private final String imageFruit = "C:\\Users\\owner\\Desktop\\forExe3\\Fruit.png";
-	private final String imageMap;
 	private Game game;
 	private ArrayList<Path> pathes = new ArrayList<Path>();
 	private int counter;
 
 	private String status = "";
 
-	private int x = -1;
-	private int y = -1;
-	private double ratioY;
-	private double ratioX;
-
-	private ShortestPathAlgo simulation;
+	private ShortestPathAlgo algorithm;
 	private int TIME = 0;
-	int DELAY = 1000;
+	int DELAY = 10;
 	Timer timer ;
 
 	/**
@@ -60,10 +63,9 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 	public GameFrame(Map map) {
 		createGui();
 		game = new Game();
-		imageMap =  map.getFilePath();
-		myImage = map.getMyImage();
-		Image_initial_Width = myImage.getWidth();
-		Image_initial_Height = myImage.getHeight();
+		mapImage = map.getMyImage();
+		Image_initial_Width = mapImage.getWidth();
+		Image_initial_Height = mapImage.getHeight();
 		ratioY = 1;
 		ratioX = 1;
 		this.setSize(Image_initial_Width, Image_initial_Height);
@@ -72,6 +74,16 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 
 	// create the GUI
 	private void createGui() {
+		try {
+			packmanImage= ImageIO.read(new File(packmanPath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			fruitImage= ImageIO.read(new File(fruitPath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		timer = new Timer(DELAY, this);
 		addMouseListener(this); 
 		addComponentListener(this);
@@ -117,8 +129,9 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 		if(game.getFruits().size() == 0) status = "EXCEPTION";
 		else{
 			status = "SIMULATION";
-			simulation = new ShortestPathAlgo(this.game);
-			pathes = simulation.getSolution();
+			algorithm = new ShortestPathAlgo(game);
+			algorithm.start();
+			//			pathes = algorithm.getSolution();
 			repaint();
 		}
 	}
@@ -132,9 +145,6 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 	public void runSimulation() {
 		if(pathes.size() == 0) simulation();
 		status = "RUN"; 
-		for(Packman o : game.getPackmans()) {
-			System.out.println("pacman " + o.getId() + " first location " + o.getLocation());
-		}
 	}
 
 	/**
@@ -158,16 +168,24 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 	private void step() {
 		status = "RUN";
 		TIME = TIME + DELAY;
-		System.out.println(TIME/1000);
-		for (Packman pac : game.getPackmans()) {
-			Path path = pac.getPath();
-			pac.setLocation(path.pointAt(TIME/1000));
-		}
-		for(int i = 0; i < game.getFruits().size(); i++){
-			if(game.getFruits().get(i).getTime() < (TIME/1000)) {
-				game.getFruits().remove(i);
+		synchronized(game) {
+			for (Packman pac : game.getPackmans()) {
+				Path path = pac.getPath();
+				pac.setLocation(path.pointAt(TIME/1000));
+				if(path.size() > 0) {
+					if (path.get(0).getTime() < (TIME/1000)) {
+					path.remove(0);
+					}
+				}
+				
 			}
+			for(int i = 0; i < game.getFruits().size(); i++){
+				if(game.getFruits().get(i).getTime() < (TIME/1000)) {
+					game.getFruits().remove(i);
+				}
+			}	
 		}
+
 	}
 
 
@@ -202,12 +220,8 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		try {
-			myImage = ImageIO.read(new File (imageMap));
-			g.drawImage(myImage, 0,0,getWidth(),getHeight(),this);
-		}catch (IOException e) {
-			e.printStackTrace();
-		}
+		//always draw the map
+		g.drawImage(mapImage, 0,0,getWidth(),getHeight(),this);
 		//exception
 		if(status.equals("EXCEPTION")) {
 			String ex = "EXCEPTION";
@@ -234,8 +248,6 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 					prevLocation = nextLocation;
 				}
 			}
-			String time = "The longest time path: " + simulation.getTime();
-			g.drawString(time, 40, 40);
 		}
 		//run
 		if(status.equals("RUN")) {
@@ -251,24 +263,15 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 			if(Map.is_Valid_Point(p.getLocation())) {
 				x = (int)p.getLocation().x();
 				y = (int)p.getLocation().y();
-				try {
-					myImage = ImageIO.read(new File (imagePackman));
-					g.drawImage(myImage,(int)(x*ratioX) ,(int)(y*ratioY) ,50 , 50,this);
-				}catch (IOException e) {
-					e.printStackTrace();
-				}	
+				g.drawImage(packmanImage,(int)(x*ratioX) ,(int)(y*ratioY) ,30 , 30,this);
 			}
 		}
+
 		for (Fruit f : game.getFruits()) {
 			if( Map.is_Valid_Point(f.getLocation())) {
 				x = (int)f.getLocation().x();
 				y = (int)f.getLocation().y();
-				try {
-					myImage = ImageIO.read(new File (imageFruit));
-					g.drawImage(myImage, (int)(x*ratioX) ,(int)(y*ratioY) ,35 , 35 ,this);
-				}catch (IOException e) {
-					e.printStackTrace();
-				}	
+				g.drawImage(fruitImage, (int)(x*ratioX) ,(int)(y*ratioY) ,25 , 25 ,this);
 			}
 		}
 	}
@@ -277,8 +280,8 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 
 
 	public void setGame(Game gm){
-		simulation = new ShortestPathAlgo(this.game);
-		game.Game2KML(simulation);
+		algorithm = new ShortestPathAlgo(this.game);
+		game.Game2KML(algorithm);
 		game = gm;
 	}
 
