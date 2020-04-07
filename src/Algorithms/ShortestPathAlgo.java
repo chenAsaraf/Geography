@@ -15,79 +15,52 @@ import Game.Game;
 import Game.Map;
 
 /**
- * A class that receives a Game object and calculates the optimal path(the shortest) 
+ * The central algorithmic class, extends Thread Class
+ * Constructor receives a Game object and calculates the optimal path (the shortest) 
  * so that all the fruits are "eaten" as quickly as possible.
- * This is the central algorithmic class
- * includes the calculation of "fruit tracks" for each of the packmans.
- * @author Inna and Chen
+ * The algorithm updates the "fruit tracks" for each of the pacmans.
+ * Game object should be in sync with the GUI, therefore run() method has a synchronized block. 
+ * @author Chen
  *
  */
-public class ShortestPathAlgo {
-
-	private ArrayList<Fruit> fruits;
-	private ArrayList<Packman> pacmans;
-	private ArrayList<Path> solution;
-	private int timeForAll = 0;
-	private final Packman_comperator comp = new Packman_comperator();
-
+public class ShortestPathAlgo extends Thread{
+	private Thread t;
+	private Game game;
 
 	/**
 	 * Constructor
-	 * Initializes the fields and executes the calculation
-	 * @param game
+	 * @param currentGame Game
 	 */
-	public ShortestPathAlgo(Game game) {
-		this.fruits = game.getFruits();
-		this.pacmans = game.getPackmans();
-		this.solution = new ArrayList<>(pacmans.size());
-		execute();
+	public ShortestPathAlgo(Game currentGame) {
+		game = currentGame;
 	}
 
-
-
-
-
-
 	/*
-	 * Private void function to execute the algorithm
-	 * A greedy algorithm
-	 * search for each Fruit the closest Packman and add adds it to the list of the Packman's path
+	 * Run method to execute the algorithm 
+	 * As long as there are fruits that are not yet eaten
+	 * A greedy algorithm: look for the closest pacman for each fruit
 	 */
-	private void execute() {
-
-		ArrayList<Packman> packmanDemo = new ArrayList<Packman>(pacmans.size());
-		for(Packman p : pacmans) {
-			Packman d = new Packman(p);
-			packmanDemo.add(d);
-		}
-
-
-		pacmans.sort(comp); //sort by speed from bigger to smaller
-
-		Iterator<Fruit> f = fruits.iterator();
-		while(f.hasNext()) { 
-			Fruit fru = f.next();
-			Iterator<Packman> p = packmanDemo.iterator();
-			int closerPacID = 0;
-			int minTime = Integer.MAX_VALUE;
-			int time = 0;
-			while (p.hasNext()) { 
-				Packman pac = p.next();
-				time = calculateTime(pac, fru); 
-				if(time < minTime) { 
-					minTime = time; 
-					fru.setTime(time);
-					closerPacID = pac.getId();
+	public void run() {
+		while(!game.getFruits().isEmpty()) { 
+			// GameFrame and this class share access for the fruits and pacmans lists in Game object,
+			// therefore, one class should not update a list while another class is working on it.
+			synchronized(game) {
+				for (Fruit fru : game.getFruits()) {
+					int closerPacID = 0;
+					int minTime = Integer.MAX_VALUE;
+					int time = 0;
+					for(Packman pac : game.getPackmans()) {
+						time = calculateTime(pac, fru); 
+						if(time < minTime) { 
+							minTime = time; 
+							fru.setTime(time);
+							closerPacID = pac.getId();
+						}
+					}
+					pacmanByID(closerPacID, game.getPackmans()).getPath().add(fru , time);
 				}
-			}
-			pacmanByID(closerPacID, pacmans).getPath().add(fru , time);
-			pacmanByID(closerPacID, packmanDemo).setLocation(fru.getLocation());
-			timeForAll += time;
+			} // end synchronized section
 		}
-		for(Packman temp : pacmans) {
-			solution.add(temp.getPath());
-		}
-		System.out.println(solution.toString());
 	}
 
 
@@ -108,18 +81,6 @@ public class ShortestPathAlgo {
 
 
 	/*
-	 * Finds the Fruit in the list according to its id number
-	 */
-	private Fruit fruitByID(int id,  ArrayList<Fruit> demo) {
-		for(Fruit temp : demo) {
-			if(temp.getId() == id) return temp;
-		}
-		return null;
-	}
-
-
-
-	/*
 	 * Finds the Packman in the list according to its id number
 	 */
 	private Packman pacmanByID(int id, ArrayList<Packman> demo) {
@@ -130,34 +91,9 @@ public class ShortestPathAlgo {
 	}
 
 
-
-
-	/*
-	 * A private function to calculate the time until all fruits are eaten
-	 * according to the result of the algorithm
-	 */
-	private void setTime() {
-		int maxTime = 0; 
-		for(Path p : solution) {
-			if(maxTime < p.getTime()) maxTime = p.getTime();
-		}
-		timeForAll = maxTime;
+	public void getSolution(){
+		this.start();
 	}
-
-
-
-
-	public ArrayList<Path> getSolution(){
-		return solution;
-	}
-
-
-
-	public int getTime() {
-		setTime();
-		return timeForAll;
-	}
-
 
 
 }
