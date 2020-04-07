@@ -12,7 +12,7 @@ Multi-threaded app, based on the GIS infrastructure mentioned above.
 How It Works?
 1. Load gameboard from the csv files from gameboardData folder, or choose for yourself where to place the players and fruits (which players should eat).
 
-![csv file for example](csv gameboard-data example.JPG)
+![csv file for example](https://github.com/chenAsaraf/Geography/blob/master/csv%20gameboard-data%20example.JPG)
 
 
 calculates the shortest path to each fruit for each Packman.
