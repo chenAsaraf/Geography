@@ -11,18 +11,20 @@ Application that runs on GoogleEarth, Calculates azimuth and distance for any tw
 Multi-threaded app, based on the GIS infrastructure mentioned above.
 How It Works?
 1. Load gameboard from the csv files from gameboardData folder, or choose for yourself where to place the players and fruits (which players should eat).
+
 For example, a part of a CSV file that contains lines with coordinates for pecans (P) and rows with position coordinates for fruits (F):
 
 ![csv file for example](https://github.com/chenAsaraf/Geography/blob/master/csv%20gameboard-data%20example.JPG)
 
 
-2. Next, the software algorithm will calculate for each Pacman its fruit track so that all fruits will eat in the shortest time.
-   The algorithm is a greedy algorithm. That is, checking at any given time which pacman is closest to the leftover fruit.
-   The algorithm runs in a separate thread from the GUI, in order for the calculation to continue to be performed without delaying the      game view.
+2. Next, by clicking "Play-> Run" the software algorithm will calculate for each Pacman its fruit's track so that all fruits will be eaten in the shortest time.
+   This is a greedy algorithm, That is, checking at any given time which pacman is closest to the leftover fruits.
+   When clicking "Run" The algorithm runs in a separate thread from the GUI, in order for the calculation to continue to be performed without delaying the game view.
    Because the algorithm and the display both use the list of pacmans and fruits, it is necessary to synchronize the trades with access to them (see the method "run()" in ShortestPathAlgo class, and "step()" in GameFrame class).
    
-built as a game, can push an existing csv file of Packman or draw Packmans and fruits by ourselves and then click RUN which will run the game with the most effective path (using the algorithm described earlier).
-the game outputs a KML file which runs on GoogleEarth.
+   
+   
+3. The game outputs a KML file which runs on GoogleEarth.
 
 
 Introduction and Summary:
