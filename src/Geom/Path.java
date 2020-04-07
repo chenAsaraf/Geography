@@ -9,10 +9,10 @@ import Geom.Point3D;
 /**
  * A route made up of a GPS point collection
  * with methods to find its length as well as additional geographic information
- * @author Inna and Chen
+ * @author Chen
  */
 public class Path {
-	private  ArrayList<Fruit> path;
+	private ArrayList<Fruit> path;
 	private Packman packman;
 	private int time; 
 
@@ -44,7 +44,7 @@ public class Path {
 		else{ 
 			path.add(fruit);
 			this.time += fruitTime; 
-			fruit.setTime(time);
+			fruit.setTime(this.time);
 			return true;
 		}
 	}
@@ -105,6 +105,14 @@ public class Path {
 
 	public ArrayList<Fruit> getPath() {
 		return path;
+	}
+	
+	public Fruit get(int index){
+		return path.get(index);
+	}
+	
+	public void remove(int index) {
+		path.remove(index);
 	}
 
 	public void setPath(ArrayList<Fruit> path) {
