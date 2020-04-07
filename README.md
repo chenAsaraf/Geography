@@ -2,14 +2,20 @@
 
 General Orientation:
 
-GPS APP:
+## GPS App:
 
-application that runs on GoogleEarth, Calculates azimuth and distance for any two coordinates, Converts csv files into KML file by turning them to a GIS collection (elements, layers and finally project), The KML file contains TimeStamp and Point Coordinates.
+Application that runs on GoogleEarth, Calculates azimuth and distance for any two coordinates, Converts csv files into KML file by turning them to a GIS collection (elements, layers and finally project), The KML file contains TimeStamp and Point Coordinates.
 
-PACMAN GAME:
+## Pacman Based GIS Game:
 
-using the GPS app above
-getting CSV file of Packmans and fruits they should eat, calculates the shortest path to each fruit for each Packman.
+Multi-threaded app, based on the GIS infrastructure mentioned above.
+How It Works?
+1. Load gameboard from the csv files from gameboardData folder, or choose for yourself where to place the players and fruits (which players should eat).
+
+![csv file for example](csv gameboard-data example.JPG)
+
+
+calculates the shortest path to each fruit for each Packman.
 built as a game, can push an existing csv file of Packman or draw Packmans and fruits by ourselves and then click RUN which will run the game with the most effective path (using the algorithm described earlier).
 the game outputs a KML file which runs on GoogleEarth.
 
