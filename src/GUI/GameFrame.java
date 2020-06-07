@@ -34,10 +34,9 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 	public int Image_initial_Width; 
 	public int Image_initial_Height;
 	/*pictures buffered images:*/
-	private BufferedImage mapImage; //	private BufferedImage myImage;
+	private BufferedImage mapImage; 
 	private BufferedImage packmanImage;
 	private BufferedImage fruitImage;
-	//TODO: Encapsulate it into classes (getPathImagePackman())
 	private final String packmanPath = "Images\\Packman.png";
 	private final String fruitPath = "Images\\Fruit.png";
 	/*repaint's coordinates:*/
@@ -131,7 +130,6 @@ public class GameFrame extends JPanel implements MouseListener, ActionListener, 
 			status = "SIMULATION";
 			algorithm = new ShortestPathAlgo(game);
 			algorithm.start();
-			//			pathes = algorithm.getSolution();
 			repaint();
 		}
 	}
