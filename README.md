@@ -20,7 +20,7 @@ For example, a part of a CSV file that contains lines with coordinates for pecan
 2. Next, by clicking "Play-> Run" the software algorithm will calculate for each Pacman its fruit's track so that all fruits will be eaten in the shortest time.
    This is a greedy algorithm, That is, checking at any given time which pacman is closest to the leftover fruits.
    When clicking "Run" The algorithm runs in a separate thread from the GUI, in order for the calculation to continue to be performed without delaying the game view.
-   Because the algorithm and the display both use the list of pacmans and fruits, it is necessary to synchronize the trades with access to them (see the method "run()" in ShortestPathAlgo class, and "step()" in GameFrame class).
+   Because the algorithm and the display both use the list of pacmans and fruits, it is necessary to synchronize the threads with access to them (see the method "run()" in ShortestPathAlgo class, and "step()" in GameFrame class).
    
 ![gameboard for example](https://github.com/chenAsaraf/Geography/blob/master/image%20board%20example.JPG)
    
