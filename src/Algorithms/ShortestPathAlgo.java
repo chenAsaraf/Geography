@@ -26,7 +26,7 @@ import Game.Map;
 public class ShortestPathAlgo extends Thread{
 	private Thread t;
 	private Game game;
-
+ 
 	/**
 	 * Constructor
 	 * @param currentGame Game
